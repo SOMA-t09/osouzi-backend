@@ -21,7 +21,8 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     """
     # ユーザー名が既に存在するか確認
     if db.query(User).filter(User.username == user.username).first():
-        raise HTTPException(status_code=400, detail="Username already exists")
+        raise HTTPException(status_code=400, detail="既に使用されているユーザー名です。")
+    
 
     # パスワードをハッシュ化して新しいユーザーを作成
     hashed_password = get_password_hash(user.password)

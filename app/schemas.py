@@ -28,7 +28,7 @@ from pydantic import BaseModel, EmailStr
 class UserCreate(BaseModel):
     username: str  # ユーザー名
     password: str  # パスワード
-
+    
     class Config:
         from_attributes = True
 
