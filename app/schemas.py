@@ -25,31 +25,43 @@ class TodoResponse(TodoBase):
 
 from pydantic import BaseModel
 
-# ユーザー登録用のスキーマ
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3,  description="ユーザー名（ひらがな・英数字・_・-）")
-    password: str = Field(..., min_length=8, description="パスワード（8文字以上）")
+    username: str = Field(..., description="ユーザー名（ひらがな・英数字・_・-）")
+    password: str = Field(..., description="パスワード（8文字以上）")
 
     @field_validator("username")
     def validate_username(cls, value):
-        # 空白・スペースのみ禁止
-        if not value.strip():
+        # 前後スペース削除
+        clean_value = value.strip()
+
+        # 空白のみ禁止
+        if not clean_value:
             raise ValueError("ユーザー名を入力してください。（空白のみは不可）")
 
-        # ひらがな＋英数字＋_・- のみ許可
-        if not re.match(r"^[\u3040-\u309F_a-zA-Z0-9-]+$", value.strip()):
+        # スペースを除いた文字数で判定
+        if len(re.sub(r"\s", "", clean_value)) < 3:
+            raise ValueError("ユーザー名は3文字以上で入力してください。（スペースは含まれません）")
+
+        # 使用可能文字チェック
+        if not re.match(r"^[\u3040-\u309F_a-zA-Z0-9-]+$", clean_value.replace(" ", "")):
             raise ValueError("ユーザー名はひらがな・英数字・_・-のみ使用できます。")
 
-        return value.strip()
+        return clean_value
 
     @field_validator("password")
     def validate_password(cls, value):
-        # 空白・スペースのみ禁止
-        if not value.strip():
+        clean_value = value.strip()
+
+        # 空白のみ禁止
+        if not clean_value:
             raise ValueError("パスワードを入力してください。（空白のみは不可）")
 
-        # 英字・数字・記号をすべて含むかチェック
-        password = value.strip()
+        # スペース除外して長さ確認
+        if len(re.sub(r"\s", "", clean_value)) < 8:
+            raise ValueError("パスワードは8文字以上で入力してください。（スペースは含まれません）")
+
+        # 英字・数字・記号を含むか確認
+        password = re.sub(r"\s", "", clean_value)
         has_letter = re.search(r"[A-Za-z]", password)
         has_number = re.search(r"[0-9]", password)
         has_symbol = re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
@@ -57,8 +69,8 @@ class UserCreate(BaseModel):
         if not (has_letter and has_number and has_symbol):
             raise ValueError("パスワードは英字・数字・記号をそれぞれ1文字以上含めてください。")
 
-        return password
-
+        return clean_value
+    
     class Config:
         from_attributes = True
 
