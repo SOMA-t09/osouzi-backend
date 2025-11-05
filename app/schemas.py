@@ -18,8 +18,7 @@ class ListCreate(ListBase):
 
 class ListResponse(ListBase):
     id: int
-    createdAt: str
-    updatedAt: str
+    title:str
     user_id: int
 
     class Config:
@@ -84,13 +83,4 @@ class UserLogin(BaseModel):
     class Config:
         from_attributes = True
 
-class ListCreate(BaseModel):
-    title: str
 
-class ListResponse(BaseModel):
-    id: int
-    title: str
-    user_id: int
-
-    class Config:
-        from_attributes = True  # Pydantic v2 の場合
