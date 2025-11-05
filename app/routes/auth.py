@@ -45,7 +45,10 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
 
     # JWTトークンを生成して返す
     access_token = create_access_token(data={"sub": str(db_user.id)}, expires_delta=timedelta(minutes=30))
-    return {"token": access_token}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 # 現在のユーザーを取得するヘルパー関数
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):

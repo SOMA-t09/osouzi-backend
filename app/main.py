@@ -1,14 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, todos
+from app.routes import auth, lists
 from app.database import Base, engine
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, todos
+from app.routes import auth, lists
 from app.database import Base, engine
 
 # データベースの初期化
 Base.metadata.create_all(bind=engine)
+
+# main.py の create_all の直後に追加
+import os
+print("=== 現在のDBパス ===")
+print(os.path.abspath(engine.url.database))
 
 app = FastAPI()
 
@@ -29,4 +34,4 @@ app.add_middleware(
 
 # ルーターを追加
 app.include_router(auth.router)
-app.include_router(todos.router)
+app.include_router(lists.router)

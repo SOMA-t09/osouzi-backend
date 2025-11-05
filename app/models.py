@@ -8,21 +8,18 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    todos = relationship("Todo", back_populates="user")
+    lists = relationship("List", back_populates="user")
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.sql import func
 
-class Todo(Base):
-    __tablename__ = "todos"
+class List(Base):
+    __tablename__ = "lists"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    details = Column(String, nullable=True)
-    completed = Column(Boolean, default=False)
-    createdAt = Column(DateTime, default=func.now())  # 作成日時を現在時刻で自動設定
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
+    title = Column(String, index=True,nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     # Userとのリレーション
-    user = relationship("User", back_populates="todos")
+    user = relationship("User", back_populates="lists")
+

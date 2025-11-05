@@ -3,24 +3,26 @@ from typing import Optional
 from datetime import datetime
 import re
 
-# 基本のタスクスキーマ
-class TodoBase(BaseModel):
-    title: str  # タスクのタイトル（必須）
-    details: Optional[str] = None  # タスクの詳細（任意）
+class ListBase(BaseModel):
+    title: str
 
-# タスク作成用のスキーマ
-class TodoCreate(TodoBase):
-    pass  # TodoBaseと同じ内容なので、そのまま継承
+    @field_validator("title")
+    def title_not_blank(cls, v):
+        # 半角・全角スペースのみを禁止
+        if not v or not v.strip() or not v.replace("　", "").strip():
+            raise ValueError("部屋名を入力してください。")
+        return v
 
-# タスクレスポンス用のスキーマ
-class TodoResponse(TodoBase):
-    id: int  # タスクID
-    createdAt: datetime  # 作成日時
-    updatedAt: datetime  # 更新日時
-    completed: bool  # 完了フラグ
+class ListCreate(ListBase):
+    pass
+
+class ListResponse(ListBase):
+    id: int
+    createdAt: str
+    updatedAt: str
+    user_id: int
 
     class Config:
-        # ORM（データベースモデル）からデータを読み取る設定
         from_attributes = True
 
 from pydantic import BaseModel
@@ -81,3 +83,14 @@ class UserLogin(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ListCreate(BaseModel):
+    title: str
+
+class ListResponse(BaseModel):
+    id: int
+    title: str
+    user_id: int
+
+    class Config:
+        from_attributes = True  # Pydantic v2 の場合
