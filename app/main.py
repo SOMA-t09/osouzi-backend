@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import auth, lists
 from app.database import Base, engine
+from app.routes import auth, places
 
 # データベースの初期化
 Base.metadata.create_all(bind=engine)
@@ -35,3 +36,4 @@ app.add_middleware(
 # ルーターを追加
 app.include_router(auth.router)
 app.include_router(lists.router)
+app.include_router(places.router)

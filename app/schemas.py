@@ -84,3 +84,25 @@ class UserLogin(BaseModel):
         from_attributes = True
 
 
+# app/schemas.py
+from pydantic import BaseModel
+
+class PlaceBase(BaseModel):
+    name: str
+
+class PlaceCreate(PlaceBase):
+    pass
+
+class PlaceResponse(PlaceBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class ListResponse(BaseModel):
+    id: int
+    title: str
+    places: list[PlaceResponse]
+
+    class Config:
+        from_attributes = True
