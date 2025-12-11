@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import List, Place
-from app.schemas import PlaceCreate, PlaceResponse, ListResponse
+from app.schemas import PlaceCreate, PlaceUpdate, PlaceResponse, ListResponse
 
 router = APIRouter(prefix="/lists", tags=["places"])
+
 
 # ① GET /lists/{list_id}/places
 @router.get("/{list_id}/places", response_model=ListResponse)
@@ -29,7 +30,22 @@ def create_place(list_id: int, place_data: PlaceCreate, db: Session = Depends(ge
     return new_place
 
 
-# ③ DELETE /lists/places/{place_id}
+# ③ PUT /lists/places/{place_id}  ← 追加
+@router.put("/places/{place_id}", response_model=PlaceResponse)
+def update_place(place_id: int, place_data: PlaceUpdate, db: Session = Depends(get_db)):
+    place = db.query(Place).filter(Place.id == place_id).first()
+
+    if not place:
+        raise HTTPException(status_code=404, detail="Place not found")
+
+    place.name = place_data.name  # 名前を更新
+    db.commit()
+    db.refresh(place)
+
+    return place
+
+
+# ④ DELETE /lists/places/{place_id}
 @router.delete("/places/{place_id}")
 def delete_place(place_id: int, db: Session = Depends(get_db)):
     place = db.query(Place).filter(Place.id == place_id).first()

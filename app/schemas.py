@@ -93,6 +93,9 @@ class PlaceBase(BaseModel):
 class PlaceCreate(PlaceBase):
     pass
 
+class PlaceUpdate(PlaceBase):
+    pass
+
 class PlaceResponse(PlaceBase):
     id: int
 
