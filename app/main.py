@@ -4,32 +4,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import auth, lists, places
 from app.database import Base, engine
 
-# データベースの初期化
-Base.metadata.create_all(bind=engine)
-
-# main.py の create_all の直後に追加
-import os
-print("=== 現在のDBパス ===")
-print(os.path.abspath(engine.url.database))
-
 app = FastAPI()
 
-# CORS の設定
-origins = [
-    "http://localhost",          # フロントエンドが動作しているドメイン
-    "http://127.0.0.1:3000",     # 必要に応じて他のオリジンも追加
-]
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
-# CORS ミドルウェアの設定
+@app.get("/")
+def root():
+    return {"ok": True}
+
+@app.get("/health")
+def health():
+    return {"ok": True}
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],         # 必要に応じて特定のオリジンを指定
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],         # すべての HTTP メソッドを許可
-    allow_headers=["*"],         # すべてのヘッダーを許可
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# ルーターを追加
 app.include_router(auth.router)
 app.include_router(lists.router)
 app.include_router(places.router)
